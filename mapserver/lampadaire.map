@@ -1,0 +1,318 @@
+# Map file created from QGIS project file C:/Users/BOLONDIN/Desktop/FORMATION/lampadaire.qgs
+# Edit this file to customize for your map interface
+# (Created with PyQgis MapServer Export plugin)
+MAP
+  NAME "QGIS-MAP"
+  # Map image size
+  SIZE 1000 1000
+  UNITS meters
+  CONFIG "MS_ENCRYPTION_KEY" "/var/www/mykey.txt"
+  CONFIG "MS_ERRORFILE" "/var/www/ms_error.txt"
+  DEBUG 3
+
+  EXTENT 228786.349198 1619904.1200336 243917.944030 1627838.064797
+  FONTSET './fonts/fonts.txt'
+  SYMBOLSET './symbols/symbols.txt'
+  PROJECTION
+    'proj=utm'
+    'zone=28'
+    'datum=WGS84'
+    'units=m'
+    'no_defs'
+  END
+
+  # Background color for the map canvas -- change as desired
+  IMAGECOLOR 255 255 255
+  IMAGEQUALITY 95
+  IMAGETYPE agg
+
+  OUTPUTFORMAT
+    NAME agg
+    DRIVER AGG/PNG
+    IMAGEMODE RGB
+  END
+  # Legend
+  LEGEND
+      IMAGECOLOR 255 255 255
+    STATUS ON
+    KEYSIZE 18 12
+    LABEL
+      TYPE BITMAP
+      SIZE MEDIUM
+      COLOR 0 0 89
+    END
+  END
+
+  # Web interface definition. Only the template parameter
+  # is required to display a map. See MapServer documentation
+  WEB
+    # Set IMAGEPATH to the path where MapServer should
+    # write its output.
+    IMAGEPATH '/tmp/'
+
+    # Set IMAGEURL to the url that points to IMAGEPATH
+    # as defined in your web server configuration
+    IMAGEURL '/tmp/'
+
+    # WMS server settings
+    METADATA
+      'wms_title'           'QGIS-MAP'
+      'wms_onlineresource'  'http://172.31.31.119/cgi-bin/mapserv?map=/var/www/lampadaire.map&'
+      'wms_srs'             'EPSG:32628'
+      "wms_enable_request" "*"
+      "wms_include_items" "all"
+
+
+    END
+
+    #Scale range at which web interface will operate
+    # Template and header/footer settings
+    # Only the template parameter is required to display a map. See MapServer documentation
+    TEMPLATE 'fooOnlyForWMSGetFeatureInfo'
+  END
+
+  LAYER
+    NAME 'quartier_dakar'
+#    MINSCALEDENOM 0
+#    MAXSCALEDENOM 40000
+    TYPE POLYGON
+    DUMP true
+    TEMPLATE fooOnlyForWMSGetFeatureInfo
+  EXTENT 228786.349198 1619904.1200336 243917.944030 1627838.064797
+    CONNECTIONTYPE postgis
+    CONNECTION "dbname='lampadaire' host=172.31.31.119 port=5432 user='postgres' password={13A8154F268786AA} sslmode=disable"
+    DATA 'the_geom FROM "quartier_dakar" USING UNIQUE gid USING srid=32628'
+    METADATA
+      'wms_title' 'quartier_dakar'
+      "wms_enable_request" "*"
+      "wms_inlude_items" "all"
+      "ows_featureinfo_textplain_include_items" "*"
+      "Name" "Quartier Dakar"
+    END
+    STATUS OFF
+    TRANSPARENCY 50
+    PROJECTION
+    'proj=utm'
+    'zone=28'
+    'datum=WGS84'
+    'units=m'
+    'no_defs'
+    END
+    CLASS
+       NAME 'quartier_dakar' 
+       STYLE
+         WIDTH 0.91 
+         COLOR 104 100 151
+       END
+    END
+  END
+
+  LAYER
+    NAME 'troncon_eclairage'
+    TYPE LINE
+    DUMP true
+    TEMPLATE fooOnlyForWMSGetFeatureInfo
+  EXTENT 228786.349198 1619904.1200336 243917.944030 1627838.064797
+    CONNECTIONTYPE postgis
+    CONNECTION "dbname='lampadaire' host=172.31.31.119 port=5432 user='postgres' password={13A8154F268786AA} sslmode=disable"
+    DATA 'geom2 FROM "troncon_eclairage" USING UNIQUE id_troncon USING srid=32628'
+    METADATA
+      'ows_title' 'troncon_eclairage'
+      "wms_enable_request" "*"
+      "wms_inlude_items" "all"
+      "ows_featureinfo_textplain_include_items" "*"
+    END
+    STATUS OFF
+    TRANSPARENCY 100
+    PROJECTION
+    'proj=utm'
+    'zone=28'
+    'datum=WGS84'
+    'units=m'
+    'no_defs'
+    END
+    CLASSITEM 'coeff_eclairage'
+    CLASS
+      NAME '5.706 < coeff_eclairage < 24.564'
+      EXPRESSION ( ([coeff_eclairage] >= 5.706) AND ([coeff_eclairage] <= 24.564) )
+       STYLE
+         WIDTH 1.4 
+         COLOR 50 63 63
+       END
+    END
+    CLASS
+      NAME '24.564 < coeff_eclairage < 43.423'
+      EXPRESSION ( ([coeff_eclairage] >= 24.564) AND ([coeff_eclairage] <= 43.423) )
+       STYLE
+         WIDTH 1.4 
+         COLOR 134 155 146
+       END
+    END
+    CLASS
+      NAME '43.423 < coeff_eclairage < 62.282'
+      EXPRESSION ( ([coeff_eclairage] >= 43.423) AND ([coeff_eclairage] <= 62.282) )
+       STYLE
+         WIDTH 1.4 
+         COLOR 211 0 0
+       END
+    END
+    CLASS
+      NAME '62.282 < coeff_eclairage < 81.141'
+      EXPRESSION ( ([coeff_eclairage] >= 62.282) AND ([coeff_eclairage] <= 81.141) )
+       STYLE
+         WIDTH 1.4 
+         COLOR 205 192 41
+       END
+    END
+    CLASS
+      NAME '81.141 < coeff_eclairage < 100.000'
+      EXPRESSION ( ([coeff_eclairage] >= 81.141) AND ([coeff_eclairage] <= 100.000) )
+       STYLE
+         WIDTH 1.4 
+         COLOR 255 255 127
+       END
+    END
+  END
+
+  LAYER
+    NAME 'lampadaire_buffer'
+    MINSCALEDENOM 0
+    MAXSCALEDENOM 10000
+    TYPE POLYGON
+    DUMP true
+    TEMPLATE fooOnlyForWMSGetFeatureInfo
+  EXTENT 228786.349198 1619904.1200336 243917.944030 1627838.064797
+    CONNECTIONTYPE postgis
+    CONNECTION "dbname='lampadaire' host=172.31.31.119 port=5432 user='postgres' password={13A8154F268786AA} sslmode=disable"
+    DATA 'the_geom FROM "lampadaire_buffer" USING UNIQUE id_0 USING srid=32628'
+    METADATA
+      'ows_title' 'lampadaire_buffer'
+      "wms_enable_request" "*"
+      "wms_inlude_items" "all"
+      "ows_featureinfo_textplain_include_items" "*"
+    END
+    STATUS OFF
+    TRANSPARENCY 80
+    PROJECTION
+    'proj=utm'
+    'zone=28'
+    'datum=WGS84'
+    'units=m'
+    'no_defs'
+    END
+    CLASS
+       NAME 'lampadaire_buffer' 
+       STYLE
+         WIDTH 0.91 
+         COLOR 255 255 0
+       END
+    END
+  END
+
+  LAYER
+    NAME 'lamp_buffer20'
+    MINSCALEDENOM 0
+    MAXSCALEDENOM 20000
+    TYPE POLYGON
+    DUMP true
+    TEMPLATE fooOnlyForWMSGetFeatureInfo
+  EXTENT 228786.349198 1619904.1200336 243917.944030 1627838.064797
+    CONNECTIONTYPE postgis
+    CONNECTION "dbname='lampadaire' host=172.31.31.119 port=5432 user='postgres' password={13A8154F268786AA} sslmode=disable"
+    DATA 'geom FROM "lamp_buffer20" USING UNIQUE id_0 USING srid=32628'
+    METADATA
+      'ows_title' 'lamp_buffer20'
+      "wms_enable_request" "*"
+      "wms_inlude_items" "all"
+      "ows_featureinfo_textplain_include_items" "*"
+    END
+    STATUS OFF
+    TRANSPARENCY 39
+    PROJECTION
+    'proj=utm'
+    'zone=28'
+    'datum=WGS84'
+    'units=m'
+    'no_defs'
+    END
+    CLASS
+       NAME 'lamp_buffer20' 
+       STYLE
+         WIDTH 0.91 
+         COLOR 255 255 0
+       END
+    END
+  END
+
+  LAYER
+    NAME 'lamp_buffer10'
+    MINSCALEDENOM 0
+    MAXSCALEDENOM 25000
+    TYPE POLYGON
+    DUMP true
+    TEMPLATE fooOnlyForWMSGetFeatureInfo
+  EXTENT 228786.349198 1619904.1200336 243917.944030 1627838.064797
+    CONNECTIONTYPE postgis
+    CONNECTION "dbname='lampadaire' host=172.31.31.119 port=5432 user='postgres' password={13A8154F268786AA} sslmode=disable"
+    DATA 'geom FROM "lamp_buffer10" USING UNIQUE id_0 USING srid=32628'
+    METADATA
+      'ows_title' 'lamp_buffer10'
+      "wms_enable_request" "*"
+      "wms_inlude_items" "all"
+      "ows_featureinfo_textplain_include_items" "*"
+    END
+    STATUS OFF
+    TRANSPARENCY 100
+    PROJECTION
+    'proj=utm'
+    'zone=28'
+    'datum=WGS84'
+    'units=m'
+    'no_defs'
+    END
+    CLASS
+       NAME 'lamp_buffer10' 
+       STYLE
+         WIDTH 0.91 
+         COLOR 255 255 0
+       END
+    END
+  END
+
+  LAYER
+    NAME 'lampadaire'
+    MINSCALEDENOM 0
+    MAXSCALEDENOM 30000
+    TYPE POINT
+    DUMP true
+    TEMPLATE fooOnlyForWMSGetFeatureInfo
+  EXTENT 228786.349198 1619904.1200336 243917.944030 1627838.064797
+    CONNECTIONTYPE postgis
+    CONNECTION "dbname='lampadaire' host=172.31.31.119 port=5432 user='postgres' password={13A8154F268786AA} sslmode=disable"
+    DATA 'geom FROM "lampadaire" USING UNIQUE id_0 USING srid=32628'
+    METADATA
+      'ows_title' 'lampadaire'
+      "wms_enable_request" "*"
+      "wms_inlude_items" "all"
+      "ows_featureinfo_textplain_include_items" "*"
+    END
+    STATUS OFF
+    TRANSPARENCY 50
+    PROJECTION
+    'proj=utm'
+    'zone=28'
+    'datum=WGS84'
+    'units=m'
+    'no_defs'
+    END
+    CLASS
+       NAME 'lampadaire' 
+       STYLE
+         SYMBOL "circle" 
+         SIZE 7.0 
+         COLOR 255 255 0
+       END
+    END
+  END
+
+END
