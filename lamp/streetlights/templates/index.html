@@ -12,7 +12,10 @@
     {% bootstrap_javascript %}
 </head>
 <body>
-{% leaflet_map "main" callback="main_map_init" %}
+    <nav class="navbar navbar-default navbar-static-top" role="navigation" style="margin-bottom: 0;">
+        <a class="navbar-brand" href="#">Appli Lampadaire</a>
+    </nav>
+    {% leaflet_map "main" callback="main_map_init" %}
 
 <div id="lamp-attributes" class="well well-sm">
     <button type="button" class="close" id="close-attr" ><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
@@ -37,13 +40,41 @@
         iconUrl: '/static/img/lamp.png',
         iconSize: [24, 24],
     });
+
+    var geoJsonLayer = null;
+
     function main_map_init (map, options) {
+        mapo = map; 
+         map.panTo(map.locate({watch: true}).options.center, {zoom: 10});
         // Use Leaflet API here
+        var wms = L.tileLayer.wms("http://worldmap.harvard.edu/geoserver/wms", {
+            layers: 'geonode:geoname_africa_places',
+            format: 'image/png',
+            transparent: true,
+        });
+        map.on('baselayerchange',function(e){
+            wms.setZIndex(10);          
+        });
+        var layersControl = L.control.layers();
+        layersControl.addOverlay(wms,"Africa places");
+        layersControl.addTo(map);
+
+        map.on('dragend', function(e) {
+            addGeoJson(this);
+        });
+
+        addGeoJson(map);
+    }
+
+    function addGeoJson(map){
+        if (geoJsonLayer != null) {
+            map.removeLayer(geoJsonLayer);
+        }
         var dataurl = '{% url "data" %}';
         // Download GeoJSON via Ajax
-        $.getJSON(dataurl, function (data) {
+        $.getJSON(dataurl+'?y='+map.getCenter().lat+'&x='+map.getCenter().lng+'&p=1000', function (data) {
             // Add GeoJSON layer
-            L.geoJson(data, {
+            geoJsonLayer = L.geoJson(data, {
             pointToLayer: function(feature, latlng) {
                 return L.marker(latlng, {icon: myIcon});
             },
@@ -56,19 +87,10 @@
                         console.log(e.target.feature);
                     });
                 }
-            }).addTo(map, {icon: myIcon});
+            });
+
+            geoJsonLayer.addTo(map, {icon: myIcon});
         });
-        var wms = L.tileLayer.wms("http://worldmap.harvard.edu/geoserver/wms", {
-            layers: 'geonode:geoname_africa_places',
-            format: 'image/png',
-            transparent: true,
-        });
-        map.on('baselayerchange',function(e){
-            wms.setZIndex(10);          
-        });
-        var layersControl = L.control.layers();
-        layersControl.addOverlay(wms,"Africa places");
-        layersControl.addTo(map);
     }
 </script>
 
@@ -83,9 +105,13 @@
 </script>
 
 <style type="text/css">
-    html, body, .leaflet-container {
+    html, body {
         height: 100%;
         position: relative;
+    }
+
+    .leaflet-container {
+        height: calc(100% - 51px);
     }
 
     #lamp-attributes {
