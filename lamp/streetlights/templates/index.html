@@ -78,10 +78,10 @@
     });
 
     var geoJsonLayer = null;
-
+    var map_object = null;
     function main_map_init (map, options) {
-        mapo = map; 
-         map.panTo(map.locate({watch: true}).options.center, {zoom: 10});
+        map_object = map; 
+        map.panTo(map.locate({watch: true}).options.center, {zoom: 10});
         // Use Leaflet API here
         var wms = L.tileLayer.wms("http://worldmap.harvard.edu/geoserver/wms", {
             layers: 'geonode:geoname_africa_places',
@@ -166,14 +166,15 @@
 
 <script type="text/javascript">
     $(function(){
-        /*$('body').on('submit', '#main .form-lamp', function(e){
+        $('body').on('submit', '#main .form-lamp', function(e){
             e.preventDefault();
             console.log($(this).serializeArray());
-            $.post('yapp', $(this).serializeArray(), function(data){
-
+            var dataurl = '{% url "data" %}';
+            $.post(dataurl, $(this).serializeArray(), function(data){
+                addGeoJson(map_object);
             });
 
-        });*/
+        });
 
         $('#depart_btn').click(function(e){
             e.preventDefault();
