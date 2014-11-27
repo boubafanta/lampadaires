@@ -4,29 +4,49 @@ from django.contrib.gis.measure import D
 from djgeojson.serializers import Serializer
 from models import Lampadaire
 from django.contrib.gis.geos import Point
+from django.views.decorators.csrf import csrf_exempt
 # Create your views here.
 def index(request):
 	return render(request,'index.html')
+@csrf_exempt
 def geodata(request):
-	try:
-        	x=float(request.GET['x'])
-        	y=float(request.GET['y'])
-        	p=float(request.GET['p'])
-        	pt= Point(x,y,srid=4326)
-        	pt.transform(32628)
-	except Exception:
-        	pass
-	geojson = Serializer().serialize(
-	#Lampadaire.objects.all()[:100],
-	Lampadaire.objects.filter(geom__dwithin=(pt,D(m=p) ) ) )
-	return HttpResponse(
-		geojson,
-        	content_type="application/json"
-    	)
-def save(request):
-	#s=request.POST.get['statut']
-	s=request.POST.get['statut']
-	id_lampe=float(request.POST.get['id'])
-	sama_lampe=Lampadaire(gid=id_lampe,states=s)
-	sama_lampe.save()
-	return render(request,'index.html')
+	if request.method=='GET':
+		try:
+        		x=float(request.GET['x'])
+        		y=float(request.GET['y'])
+        		p=float(request.GET['p'])
+        		pt= Point(x,y,srid=4326)
+        		pt.transform(32628)
+		except Exception:
+        		pass
+		geojson = Serializer().serialize(
+		#Lampadaire.objects.all()[:100],
+		Lampadaire.objects.filter(geom__dwithin=(pt,D(m=p) ) ) )
+		return HttpResponse(
+			geojson,
+        		content_type="application/json"
+    		)
+	elif request.method == 'POST':
+		#s=request.POST.get['statut']
+		s=request.POST['statut']
+		id_lampe=float(request.POST['id'])
+		sama_lampe=get_object_or_404(Lampadaire, gid=id_lampe)
+		sama_lampe.states=s
+		sama_lampe.save()
+		geojson = Serializer().serialize(Lampadaire.objects.filter(gid=id_lampe))
+		return HttpResponse(
+			geojson,
+        		content_type="application/json"
+    		)
+def denthialma(request):
+		#s=request.POST.get['statut']
+		s=request.GET['statut']
+		id_lampe=float(request.GET['id'])
+		sama_lampe=get_object_or_404(Lampadaire, gid=id_lampe)
+		sama_lampe.states=s
+		sama_lampe.save()
+		geojson = Serializer().serialize(Lampadaire.objects.filter(gid=id_lampe))
+		return HttpResponse(
+			geojson,
+        		content_type="application/json"
+    		)

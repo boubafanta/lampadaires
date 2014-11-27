@@ -12,40 +12,76 @@
     {% bootstrap_javascript %}
 </head>
 <body>
-    <nav class="navbar navbar-default navbar-static-top" role="navigation" style="margin-bottom: 0;">
-        <a class="navbar-brand" href="#">Appli Lampadaire</a>
+
+    <nav class="navbar navbar-default navbar-static-top" role="navigation" style="margin-bottom: 0">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="container">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="#">Lampadaire</a>
+            </div>
+
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <div class="collapse navbar-collapse navbar-ex1-collapse">
+                <form class="navbar-form navbar-right" role="search">
+                    <div class="form-group">
+                        <div class="input-group">
+                          <input type="text" class="form-control" placeholder="Depart" id="depart_input" disabled>
+                          <span class="input-group-btn">
+                            <button class="btn btn-default" id="depart_btn" type="button">Go!</button>
+                          </span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                      <div class="input-group">
+                          <input type="text" class="form-control" placeholder="Arrivé" id="arrivee_input" disabled>
+                          <span class="input-group-btn">
+                            <button class="btn btn-default" id="arrivee_btn" type="button">Go!</button>
+                          </span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                      <input type="text" class="form-control" placeholder="Coefficient d'éclairage">
+                    </div>
+                    <button type="submit" class="btn btn-info">Envoyer</button>
+                    <button type="submit" class="btn btn-danger">Annuler</button>
+                </form>
+                <ul class="nav navbar-nav navbar-right">
+                    <li><a href="#"><span class="glyphicon glyphicon-send" aria-hidden="true"></span></a></li>
+                </ul>
+            </div><!-- /.navbar-collapse -->
+        </div>
     </nav>
     {% leaflet_map "main" callback="main_map_init" %}
-
-<div id="lamp-attributes" class="well well-sm">
-    <button type="button" class="close" id="close-attr" ><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
-    <div class="clearfix"></div>
-     <div class="form-group">
-        <label for="inputEmail3" class="col-sm-6 control-label" id="lampadaire_label">Lampadaire</label>
-        <div class="col-sm-6">
-          <select class="form-control">
-              <option>OK</option>
-              <option>Broken bulb</option>
-              <option>Broken light</option>
-          </select>
-        </div>
-      </div>
-    </form>
-</div>
 
 <img src="/static/img/logo.png" id="logo">
 
 <script type="text/javascript">
-    var myIcon = L.icon({
+    var icon_ok = L.icon({
         iconUrl: '/static/img/lamp.png',
         iconSize: [24, 24],
     });
 
-    var geoJsonLayer = null;
+    var icon_bb = L.icon({
+        iconUrl: '/static/img/lamp_bb.png',
+        iconSize: [24, 24],
+    });
 
+    var icon_bl = L.icon({
+        iconUrl: '/static/img/lamp_bl.png',
+        iconSize: [24, 24],
+    });
+
+    var geoJsonLayer = null;
+    var map_object = null;
     function main_map_init (map, options) {
-        mapo = map; 
-         map.panTo(map.locate({watch: true}).options.center, {zoom: 10});
+        map_object = map; 
+        map.panTo(map.locate({watch: true}).options.center, {zoom: 10});
         // Use Leaflet API here
         var wms = L.tileLayer.wms("http://worldmap.harvard.edu/geoserver/wms", {
             layers: 'geonode:geoname_africa_places',
@@ -72,34 +108,88 @@
         }
         var dataurl = '{% url "data" %}';
         // Download GeoJSON via Ajax
-        $.getJSON(dataurl+'?y='+map.getCenter().lat+'&x='+map.getCenter().lng+'&p=1000', function (data) {
+        $.getJSON(dataurl+'?y='+map.getCenter().lat+'&x='+map.getCenter().lng+'&p=800', function (data) {
             // Add GeoJSON layer
             geoJsonLayer = L.geoJson(data, {
             pointToLayer: function(feature, latlng) {
-                return L.marker(latlng, {icon: myIcon});
+                if(feature.properties.states == 'ok')
+                    return L.marker(latlng, {icon: icon_ok});
+                else if (feature.properties.states == 'bb')
+                    return L.marker(latlng, {icon: icon_bb});
+                else if (feature.properties.states == 'bl')
+                    return L.marker(latlng, {icon: icon_bl});
             },
             onEachFeature: function (feature, layer) {
-                    //console.log(feature);                 
-                    //layer.bindPopup(feature.properties.states);
-                    layer.on('click', function (e) {
-                        $('#lamp-attributes').slideDown();
-                        $('#lampadaire_label').text('Lampadaire #'+e.target.feature.id);
-                        console.log(e.target.feature);
-                    });
+                    var html  = '<form class="form-inline form-lamp" action="/save" method="post">';
+                        html += "{% csrf_token %}";
+                        html += '<div class="form-group">';
+                        html +=     '<input type="hidden" name="id" value="'+feature.id+'"/>';
+                        html +=     '<select class="form-control" name="statut">';
+                        html +=       '<option>Etat</option>';
+                        if (feature.properties.states == 'ok') {
+                        html +=       '<option value="ok" selected>OK</option>';
+                        } else {
+                        html +=       '<option value="ok">OK</option>';
+                        }
+                        if (feature.properties.states == 'bb') {
+                        html +=       '<option value="bb" selected>Broken bulb</option>';
+                        }else{
+                        html +=       '<option value="bb">Broken bulb</option>';
+                        }
+                        if (feature.properties.states == 'bl') {
+                        html +=       '<option value="bl" selected>Broken light</option>';
+                        }else{
+                        html +=       '<option value="bl">Broken light</option>';
+                        }
+                        html +=     '</select>';
+                        html += '</div>';
+                        html += '<button type="submit" class="btn btn-info" style="margin-left: 5px;"><span class="glyphicon glyphicon-floppy-disk"></span></button>';
+                        html += '</form>';
+                    layer.bindPopup(html);
                 }
             });
 
-            geoJsonLayer.addTo(map, {icon: myIcon});
+            geoJsonLayer.addTo(map);
+        });
+
+
+        map.on('click', function(e){
+            //var marker = new L.marker(e.latlng).addTo(map);
+            if($('#depart_btn').hasClass('active')){
+                $('#depart_input').val(e.latlng.lat+","+e.latlng.lng);
+            } else if($('#arrivee_btn').hasClass('active')){
+                $('#arrivee_input').val(e.latlng.lat+","+e.latlng.lng);
+            }
         });
     }
 </script>
 
 <script type="text/javascript">
     $(function(){
-        $('#close-attr').click(function(e){
+        $('body').on('submit', '#main .form-lamp', function(e){
             e.preventDefault();
+            console.log($(this).serializeArray());
+            var dataurl = '{% url "data" %}';
+            $.post(dataurl, $(this).serializeArray(), function(data){
+                addGeoJson(map_object);
+            });
 
-            $('#lamp-attributes').slideUp();
+        });
+
+        $('#depart_btn').click(function(e){
+            e.preventDefault();
+            $(this).toggleClass('active');
+            if($(this).hasClass('active')){
+                $('#arrivee_btn').removeClass('active');
+            }
+        });
+
+        $('#arrivee_btn').click(function(e){
+            e.preventDefault();
+            $(this).toggleClass('active');
+            if($(this).hasClass('active')){
+                $('#depart_btn').removeClass('active');
+            }
         });
     });
 </script>
@@ -113,15 +203,6 @@
     .leaflet-container {
         height: calc(100% - 51px);
     }
-
-    #lamp-attributes {
-        display: none;
-        width: 250px;
-        position: absolute;
-        right: 10px;
-        bottom: 10px;
-    }
-
     #logo {
         position: absolute;
         left: 10px;
