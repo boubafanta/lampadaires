@@ -88,12 +88,22 @@
             format: 'image/png',
             transparent: true,
         });
+
+        var shuttle = L.tileLayer.wms("http://172.31.31.119/cgi-bin/mapserv?map=/var/www/lampadaire.map", {
+            layers: 'troncon_eclairage,lampadaire,lamp_buffer10,lamp_buffer20',
+            format: 'image/png',
+            transparent: true,
+        });
+
+        
         map.on('baselayerchange',function(e){
             wms.setZIndex(10);          
         });
         var layersControl = L.control.layers();
         layersControl.addOverlay(wms,"Africa places");
+        layersControl.addOverlay(shuttle,"shuttle");
         layersControl.addTo(map);
+
 
         map.on('dragend', function(e) {
             addGeoJson(this);
