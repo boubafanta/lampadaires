@@ -7,6 +7,7 @@ from django.contrib.gis.geos import Point
 # Create your views here.
 def index(request):
 	return render(request,'index.html')
+	
 def geodata(request):
 	try:
         	x=float(request.GET['x'])

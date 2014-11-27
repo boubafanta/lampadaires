@@ -17,22 +17,6 @@
     </nav>
     {% leaflet_map "main" callback="main_map_init" %}
 
-<div id="lamp-attributes" class="well well-sm">
-    <button type="button" class="close" id="close-attr" ><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
-    <div class="clearfix"></div>
-     <div class="form-group">
-        <label for="inputEmail3" class="col-sm-6 control-label" id="lampadaire_label">Lampadaire</label>
-        <div class="col-sm-6">
-          <select class="form-control">
-              <option>OK</option>
-              <option>Broken bulb</option>
-              <option>Broken light</option>
-          </select>
-        </div>
-      </div>
-    </form>
-</div>
-
 <img src="/static/img/logo.png" id="logo">
 
 <script type="text/javascript">
@@ -72,34 +56,55 @@
         }
         var dataurl = '{% url "data" %}';
         // Download GeoJSON via Ajax
-        $.getJSON(dataurl+'?y='+map.getCenter().lat+'&x='+map.getCenter().lng+'&p=1000', function (data) {
+        $.getJSON(dataurl+'?y='+map.getCenter().lat+'&x='+map.getCenter().lng+'&p=800', function (data) {
             // Add GeoJSON layer
             geoJsonLayer = L.geoJson(data, {
             pointToLayer: function(feature, latlng) {
                 return L.marker(latlng, {icon: myIcon});
             },
             onEachFeature: function (feature, layer) {
-                    //console.log(feature);                 
-                    //layer.bindPopup(feature.properties.states);
-                    layer.on('click', function (e) {
-                        $('#lamp-attributes').slideDown();
-                        $('#lampadaire_label').text('Lampadaire #'+e.target.feature.id);
-                        console.log(e.target.feature);
-                    });
+                    var html  = '<form class="form-inline form-lamp">';
+                        html += '<div class="form-group">';
+                        html +=     '<input type="hidden" name="id" value="'+feature.id+'"/>';
+                        html +=     '<select class="form-control" name="etat">';
+                        html +=       '<option>Etat</option>';
+                        if (feature.properties.states == 'ok') {
+                        html +=       '<option value="ok" selected>OK</option>';
+                        } else {
+                        html +=       '<option value="ok">OK</option>';
+                        }
+                        if (feature.properties.states == 'bb') {
+                        html +=       '<option value="bb" selected>Broken bulb</option>';
+                        }else{
+                        html +=       '<option value="bb">Broken bulb</option>';
+                        }
+                        if (feature.properties.states == 'bl') {
+                        html +=       '<option value="bl" selected>Broken light</option>';
+                        }else{
+                        html +=       '<option value="bl">Broken light</option>';
+                        }
+                        html +=     '</select>';
+                        html += '</div>';
+                        html += '<button type="submit" class="btn btn-info" style="margin-left: 5px;"><span class="glyphicon glyphicon-floppy-disk"></span></button>';
+                        html += '</form>';
+                    layer.bindPopup(html);
                 }
             });
 
-            geoJsonLayer.addTo(map, {icon: myIcon});
+            geoJsonLayer.addTo(map);
         });
     }
 </script>
 
 <script type="text/javascript">
     $(function(){
-        $('#close-attr').click(function(e){
+        $('body').on('submit', '#main .form-lamp', function(e){
             e.preventDefault();
+            console.log($(this).serializeArray());
+            $.post('yapp', $(this).serializeArray(), function(data){
 
-            $('#lamp-attributes').slideUp();
+            });
+
         });
     });
 </script>
@@ -113,15 +118,6 @@
     .leaflet-container {
         height: calc(100% - 51px);
     }
-
-    #lamp-attributes {
-        display: none;
-        width: 250px;
-        position: absolute;
-        right: 10px;
-        bottom: 10px;
-    }
-
     #logo {
         position: absolute;
         left: 10px;
