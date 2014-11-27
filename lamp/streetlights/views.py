@@ -1,4 +1,4 @@
-from django.shortcuts import render,HttpResponse
+from django.shortcuts import render,HttpResponse,get_object_or_404
 from django.http import HttpRequest
 from django.contrib.gis.measure import D
 from djgeojson.serializers import Serializer
@@ -23,3 +23,10 @@ def geodata(request):
 		geojson,
         	content_type="application/json"
     	)
+def save(request):
+	#s=request.POST.get['statut']
+	s=request.POST.get['statut']
+	id_lampe=float(request.POST.get['id'])
+	sama_lampe=Lampadaire(gid=id_lampe,states=s)
+	sama_lampe.save()
+	return render(request,'index.html')

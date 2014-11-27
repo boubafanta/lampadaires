@@ -9,5 +9,6 @@ urlpatterns = patterns('',
     url(r'^admin/', include(admin.site.urls)),
     url(r'^$', views.index,name='index'),
     url(r'^lampadaire.geojson$', views.geodata, name='data'),
-    #url(r'^lampadaire/(\d{2})/(\d{2})/$', views.month_archive)
+    #url(r'^(?P<id_lamp>[0-9]+)/save/$', views.save, name='save'),
+    url(r'^save$', views.save,name='save')
 )
