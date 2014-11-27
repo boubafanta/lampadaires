@@ -7,6 +7,8 @@ urlpatterns = patterns('',
     # url(r'^blog/', include('blog.urls')),
 
     url(r'^admin/', include(admin.site.urls)),
-    url(r'^$', views.index, name='index'),
-    url(r'^data.geojson$', views.geodata, name='data'),
+    url(r'^$', views.index,name='index'),
+    url(r'^lampadaire.geojson$', views.geodata, name='data'),
+    #url(r'^(?P<id_lamp>[0-9]+)/save/$', views.save, name='save'),
+    url(r'^save$', views.save,name='save')
 )
