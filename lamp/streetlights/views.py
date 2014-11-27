@@ -24,10 +24,11 @@ def geodata(request):
 		geojson,
         	content_type="application/json"
     	)
+
 def save(request):
 	#s=request.POST.get['statut']
-	s=request.POST.get['statut']
-	id_lampe=float(request.POST.get['id'])
+	s=request.POST['statut']
+	id_lampe=float(request.POST['id'])
 	sama_lampe=Lampadaire(gid=id_lampe,states=s)
 	sama_lampe.save()
 	return render(request,'index.html')
