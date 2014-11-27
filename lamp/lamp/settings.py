@@ -17,7 +17,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 # See https://docs.djangoproject.com/en/1.7/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'strx9w6hxmq5svd286m6t_fpatnlaupk)kzz3504eq%eidncw)'
+SECRET_KEY = '^qn^yuw75&n_(k=m1z099&53o!i@u10d$u6yl7o1l@)636*$_o'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -37,8 +37,9 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.gis',  # on ajoute le module GIS
-    'streetlights',
+    'streetlights',  # on ajoute notre application
     'leaflet',
+    'bootstrap3',
     'djgeojson'
 )
 
@@ -62,12 +63,24 @@ WSGI_APPLICATION = 'lamp.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.contrib.gis.db.backends.postgis',
-        'HOST' : 'localhost',
-        'NAME': 'perfgroup',
-	'USER': os.environ.get('LAMP_DB_USER', ''),
-        'PASSWORD': os.environ.get('LAMP_DB_PASS', ''),
+         'NAME': 'map_sante',
+         'HOST': 'localhost',
+         'ENGINE': 'django.contrib.gis.db.backends.postgis',
+         'USER': 'postgres',
+         'PASS': 'postgres',
     }
+}
+
+LEAFLET_CONFIG = {
+    'DEFAULT_CENTER': (14.7078223, -17.4343656),
+    'DEFAULT_ZOOM': 10,
+    'MIN_ZOOM': 2,
+    'MAX_ZOOM': 18,
+    'TILES': [
+        ('Esri', 'http://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}', 'Esri'),
+        ('OSM', 'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', 'OSM'),
+        ('Mapquest', 'http://otile1.mqcdn.com/tiles/1.0.0/map/{z}/{x}/{y}.png', '&copy; Mapquest'),
+    ]
 }
 
 # Internationalization
@@ -88,14 +101,3 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.7/howto/static-files/
 
 STATIC_URL = '/static/'
-
-LEAFLET_CONFIG = {
-    'DEFAULT_CENTER': (14.7, -17.4),
-    'DEFAULT_ZOOM': 12,
-    'MIN_ZOOM': 2,
-    'MAX_ZOOM': 18,
-    'TILES': [
-        ('OSM', 'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', 'OSM'),
-        ('Mapquest', 'http://otile1.mqcdn.com/tiles/1.0.0/map/{z}/{x}/{y}.png', '&copy; Mapquest'),
-        ]
-}

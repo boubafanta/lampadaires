@@ -1,40 +1,107 @@
 <html>
 {% load leaflet_tags %}
+{% load staticfiles %}
+{% load bootstrap3 %}
 <head>
 <meta charset="utf-8">
-<title>Django Lab Girls Copyright FM</title>
+<title>GeoDjango Workshop</title>
     {% leaflet_js %}
     {% leaflet_css %}
     <script src='http://code.jquery.com/jquery-2.1.1.min.js' type="text/javascript"></script>
+    {% bootstrap_css %}
+    {% bootstrap_javascript %}
 </head>
 <body>
 {% leaflet_map "main" callback="main_map_init" %}
-</body>
-</html>
+
+<div id="lamp-attributes" class="well well-sm">
+    <button type="button" class="close" id="close-attr" ><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+    <div class="clearfix"></div>
+     <div class="form-group">
+        <label for="inputEmail3" class="col-sm-6 control-label" id="lampadaire_label">Lampadaire</label>
+        <div class="col-sm-6">
+          <select class="form-control">
+              <option>OK</option>
+              <option>Broken bulb</option>
+              <option>Broken light</option>
+          </select>
+        </div>
+      </div>
+    </form>
+</div>
+
+<img src="/static/img/logo.png" id="logo">
 
 <script type="text/javascript">
+    var myIcon = L.icon({
+        iconUrl: '/static/img/lamp.png',
+        iconSize: [24, 24],
+    });
     function main_map_init (map, options) {
         // Use Leaflet API here
         var dataurl = '{% url "data" %}';
         // Download GeoJSON via Ajax
         $.getJSON(dataurl, function (data) {
             // Add GeoJSON layer
-            //L.geoJson(data).addTo(map);
-        	L.geoJson(data, {
-        		onEachFeature: function (feature, layer) {
-            		console.log(feature);
-            		layer.bindPopup(String(feature.id)+" - "+feature.properties.states);
-        		}
-    		}).addTo(map);
-	});
-
-	var wms = L.tileLayer.wms("http://worldmap.harvard.edu/geoserver/wms", {
-        layers: 'geonode:geoname_africa_places',
-        format: 'image/png',
-        transparent: true,
-    });
-    var layersControl = L.control.layers();
-    layersControl.addOverlay(wms,"Africa places");
-    layersControl.addTo(map);
+            L.geoJson(data, {
+            pointToLayer: function(feature, latlng) {
+                return L.marker(latlng, {icon: myIcon});
+            },
+            onEachFeature: function (feature, layer) {
+                    //console.log(feature);                 
+                    //layer.bindPopup(feature.properties.states);
+                    layer.on('click', function (e) {
+                        $('#lamp-attributes').slideDown();
+                        $('#lampadaire_label').text('Lampadaire #'+e.target.feature.id);
+                        console.log(e.target.feature);
+                    });
+                }
+            }).addTo(map, {icon: myIcon});
+        });
+        var wms = L.tileLayer.wms("http://worldmap.harvard.edu/geoserver/wms", {
+            layers: 'geonode:geoname_africa_places',
+            format: 'image/png',
+            transparent: true,
+        });
+        map.on('baselayerchange',function(e){
+            wms.setZIndex(10);          
+        });
+        var layersControl = L.control.layers();
+        layersControl.addOverlay(wms,"Africa places");
+        layersControl.addTo(map);
     }
 </script>
+
+<script type="text/javascript">
+    $(function(){
+        $('#close-attr').click(function(e){
+            e.preventDefault();
+
+            $('#lamp-attributes').slideUp();
+        });
+    });
+</script>
+
+<style type="text/css">
+    html, body, .leaflet-container {
+        height: 100%;
+        position: relative;
+    }
+
+    #lamp-attributes {
+        display: none;
+        width: 250px;
+        position: absolute;
+        right: 10px;
+        bottom: 10px;
+    }
+
+    #logo {
+        position: absolute;
+        left: 10px;
+        bottom: 30px;
+        width: 100px;   
+    }
+</style>
+</body>
+</html>
