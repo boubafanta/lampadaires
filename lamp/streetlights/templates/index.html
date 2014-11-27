@@ -101,7 +101,8 @@
 
         addGeoJson(map);
     }
-
+    var marker_depart  = null;
+    var marker_arrivee = null;
     function addGeoJson(map){
         if (geoJsonLayer != null) {
             map.removeLayer(geoJsonLayer);
@@ -156,8 +157,12 @@
         map.on('click', function(e){
             //var marker = new L.marker(e.latlng).addTo(map);
             if($('#depart_btn').hasClass('active')){
+                if(marker_depart != null) map.removeLayer(marker_depart);
+                marker_depart = new L.marker(e.latlng).addTo(map);
                 $('#depart_input').val(e.latlng.lat+","+e.latlng.lng);
             } else if($('#arrivee_btn').hasClass('active')){
+                if(marker_arrivee != null) map.removeLayer(marker_arrivee);
+                marker_arrivee = new L.marker(e.latlng).addTo(map);
                 $('#arrivee_input').val(e.latlng.lat+","+e.latlng.lng);
             }
         });
