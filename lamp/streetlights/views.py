@@ -87,4 +87,4 @@ def yobouma(request):
     		}
 	)
 	
-    	return HttpResponse(geojson,content_type="text/plain")
+    	return HttpResponse(geojson,content_type="application/json")
