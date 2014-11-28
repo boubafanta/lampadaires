@@ -43,7 +43,7 @@ $body$
 			id_end::integer as target,
 			st_length(geom) as cost,
 			coeff_eclairage
-			FROM tronconec where coeff_eclairage>'||$3,
+			FROM tronconec where coeff_eclairage>='||$3,
 		$1,$2,false,false)
 join tronconec as tr
 on id2 = tr.gid
@@ -56,8 +56,8 @@ create or replace function pointD(X float, Y float)
 as	
 $body$
 	SELECT gid 
-	FROM tronconec AS t
-	ORDER BY t.geom <-> ST_transform(ST_setsrid(ST_MakePoint($1,$2),4326),32628)
+	FROM voirie_plane_noeud AS t
+	ORDER BY t.geom <-> ST_transform(ST_setsrid(ST_MakePoint($2,$1),4326),32628)
 	LIMIT 1
 $body$ 
 language sql;
@@ -74,6 +74,16 @@ language sql;
 
 
 -- Test 
---SELECT *
---FROM itineraire(1366,2348,50)
+SELECT *
+FROM iti(14.66439117,-17.44131088,14.70358007,-17.45264053,0)
 
+SELECT *
+FROM pointD(14.66439117,-17.44131088)
+
+SELECT *
+FROM pointD (14.70358007,-17.45264053)
+
+SELECT * FROM itineraire(1910,970,0)
+
+SELECT * FROM voirie_plane_noeud
+WHERE gid=1910
