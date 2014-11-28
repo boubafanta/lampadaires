@@ -55,11 +55,11 @@ def denthialma(request):
 def yobouma(request):
 	cursor = connection.cursor()
 	try:
-        		x1=float(request.POST['x1'])
-        		y1=float(request.POST['y1'])
-        		x2=float(request.POST['x2'])
-        		y2=float(request.POST['y2'])
-        		p=float(request.POST['p'])
+        		x1=float(request.GET['x1'])
+        		y1=float(request.GET['y1'])
+        		x2=float(request.GET['x2'])
+        		y2=float(request.GET['y2'])
+        		p=float(request.GET['p'])
         		#pt1= Point(x1,y1,srid=4326)
         		#pt1.transform(32628)
         		#pt2= Point(x2,y2,srid=4326)
@@ -78,7 +78,7 @@ def yobouma(request):
     	{ "type": "FeatureCollection"
     		,"features": [
     			{
-    			"type": "feature", "geometry": json.loads(row[3]),
+    			"type": "Feature", "geometry": json.loads(row[3]),
     			"properties": {
     				"id_seq" : row[0], "cost" : row[1], "coeff" : row[2]
     				}

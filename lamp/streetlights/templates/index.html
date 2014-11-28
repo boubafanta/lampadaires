@@ -28,10 +28,10 @@
 
             <!-- Collect the nav links, forms, and other content for toggling -->
             <div class="collapse navbar-collapse navbar-ex1-collapse">
-                <form class="navbar-form navbar-right" role="search">
+                <form class="navbar-form navbar-right" role="search" id="form_iti">
                     <div class="form-group">
                         <div class="input-group">
-                          <input type="text" class="form-control" placeholder="Depart" id="depart_input" disabled>
+                          <input type="text" class="form-control" placeholder="Depart" name="depart" id="depart_input">
                           <span class="input-group-btn">
                             <button class="btn btn-default" id="depart_btn" type="button">Go!</button>
                           </span>
@@ -39,17 +39,16 @@
                     </div>
                     <div class="form-group">
                       <div class="input-group">
-                          <input type="text" class="form-control" placeholder="Arrivé" id="arrivee_input" disabled>
+                          <input type="text" class="form-control" placeholder="Arrivé" name="arrivee" id="arrivee_input">
                           <span class="input-group-btn">
                             <button class="btn btn-default" id="arrivee_btn" type="button">Go!</button>
                           </span>
                         </div>
                     </div>
                     <div class="form-group">
-                      <input type="text" class="form-control" placeholder="Coefficient d'éclairage">
+                      <input type="text" class="form-control" name="coeff" id="coeff_input" placeholder="Coefficient d'éclairage">
                     </div>
                     <button type="submit" class="btn btn-info">Envoyer</button>
-                    <button type="submit" class="btn btn-danger">Annuler</button>
                 </form>
                 <ul class="nav navbar-nav navbar-right">
                     <li><a href="#"><span class="glyphicon glyphicon-send" aria-hidden="true"></span></a></li>
@@ -57,9 +56,11 @@
             </div><!-- /.navbar-collapse -->
         </div>
     </nav>
+    <div id="content" class="container">
     {% leaflet_map "main" callback="main_map_init" %}
 
-<img src="/static/img/logo.png" id="logo">
+    <img src="/static/img/logo.png" id="logo">
+    </div>
 
 <script type="text/javascript">
     var icon_ok = L.icon({
@@ -78,6 +79,7 @@
     });
 
     var geoJsonLayer = null;
+    var itiLayer     = null;
     var map_object = null;
     function main_map_init (map, options) {
         map_object = map; 
@@ -90,7 +92,7 @@
         });
 
         var shuttle = L.tileLayer.wms("http://172.31.31.119/cgi-bin/mapserv?map=/var/www/lampadaire.map", {
-            layers: 'troncon_eclairage,lampadaire,lamp_buffer10,lamp_buffer20',
+            layers: 'troncon_eclairage,lampadaire,lampadaire_buffer,lamp_buffer10,lamp_buffer20',
             format: 'image/png',
             transparent: true,
         });
@@ -206,11 +208,31 @@
                 $('#depart_btn').removeClass('active');
             }
         });
+
+        $('#form_iti').submit(function(e){
+            e.preventDefault();
+
+            var data = {
+                  x1: $('#depart_input').val().split(',')[0]
+                , y1: $('#depart_input').val().split(',')[1]
+                , x2: $('#arrivee_input').val().split(',')[0]
+                , y2: $('#arrivee_input').val().split(',')[1]
+                , p: $('#coeff_input').val()
+            }
+
+            //console.log(data);
+
+            $.get('{% url "yoonbi" %}', data, function(data){
+                if(itiLayer != null) map_object.removeLayer(itiLayer);
+                itiLayer = L.geoJson(data);
+                itiLayer.addTo(map_object);
+            });
+        });
     });
 </script>
 
 <style type="text/css">
-    html, body {
+    html, body, #content {
         height: 100%;
         position: relative;
     }
