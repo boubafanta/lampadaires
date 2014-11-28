@@ -9,5 +9,6 @@ urlpatterns = patterns('',
     url(r'^admin/', include(admin.site.urls)),
     url(r'^$', views.index,name='index'),
     url(r'^lampfall$', views.geodata,  name='data'),
-    url(r'^denthi$', views.denthialma, name='denthi')
+    url(r'^yoonbi$', views.yobouma, name='yoonbi')
+    
 )
