@@ -66,9 +66,14 @@ def yobouma(request):
         		#pt2.transform(32628)
 	except Exception:
 		pass
-		
-	cursor.execute("""SELECT param_seq, param_cost, param_coef, param_geom
-			 FROM itib(%s,%s,%s,%s,%s)""", [x1,y1,x2,y2,p])
+	try:	
+		cursor.execute("""SELECT param_seq, param_cost, param_coef, param_geom
+		FROM itib(%s,%s,%s,%s,%s)""", [x1,y1,x2,y2,p])
+	except Exception:
+		reponse=json.dumps(
+		{"reponse" : "Chemin innexistant"}
+		)
+		return HttpResponse(reponse,content_type="application/json")
 	#geojson = simplejson.dumps(row) #Serializer().serialize(cursor.fetchall() )
 	#return HttpResponse(
 	#		geojson,
