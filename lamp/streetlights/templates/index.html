@@ -88,12 +88,22 @@
             format: 'image/png',
             transparent: true,
         });
+
+        var shuttle = L.tileLayer.wms("http://172.31.31.119/cgi-bin/mapserv?map=/var/www/lampadaire.map", {
+            layers: 'troncon_eclairage,lampadaire,lamp_buffer10,lamp_buffer20',
+            format: 'image/png',
+            transparent: true,
+        });
+
+        
         map.on('baselayerchange',function(e){
             wms.setZIndex(10);          
         });
         var layersControl = L.control.layers();
         layersControl.addOverlay(wms,"Africa places");
+        layersControl.addOverlay(shuttle,"shuttle");
         layersControl.addTo(map);
+
 
         map.on('dragend', function(e) {
             addGeoJson(this);
@@ -101,7 +111,8 @@
 
         addGeoJson(map);
     }
-
+    var marker_depart  = null;
+    var marker_arrivee = null;
     function addGeoJson(map){
         if (geoJsonLayer != null) {
             map.removeLayer(geoJsonLayer);
@@ -156,8 +167,12 @@
         map.on('click', function(e){
             //var marker = new L.marker(e.latlng).addTo(map);
             if($('#depart_btn').hasClass('active')){
+                if(marker_depart != null) map.removeLayer(marker_depart);
+                marker_depart = new L.marker(e.latlng).addTo(map);
                 $('#depart_input').val(e.latlng.lat+","+e.latlng.lng);
             } else if($('#arrivee_btn').hasClass('active')){
+                if(marker_arrivee != null) map.removeLayer(marker_arrivee);
+                marker_arrivee = new L.marker(e.latlng).addTo(map);
                 $('#arrivee_input').val(e.latlng.lat+","+e.latlng.lng);
             }
         });
