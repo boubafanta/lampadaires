@@ -66,8 +66,8 @@ DATABASES = {
          'NAME': 'perfgroup',
          'HOST': 'localhost',
          'ENGINE': 'django.contrib.gis.db.backends.postgis',
-         'USER': os.environ.get('LAMP_DB_USER', ''),
-         'PASS': os.environ.get('LAMP_DB_PASS', ''),
+         'USER': 'postgres',
+         'PASS': 'postgres',
     }
 }
 

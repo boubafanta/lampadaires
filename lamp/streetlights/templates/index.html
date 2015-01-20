@@ -4,6 +4,7 @@
 {% load bootstrap3 %}
 <head>
 <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>GeoDjango Workshop</title>
     {% leaflet_js %}
     {% leaflet_css %}
@@ -13,7 +14,7 @@
 </head>
 <body>
 
-    <nav class="navbar navbar-default navbar-static-top" role="navigation" style="margin-bottom: 0">
+    <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation" style="margin-bottom: 0">
         <!-- Brand and toggle get grouped for better mobile display -->
         <div class="container">
             <div class="navbar-header">
@@ -56,11 +57,16 @@
             </div><!-- /.navbar-collapse -->
         </div>
     </nav>
-    <div id="content" class="container">
-    {% leaflet_map "main" callback="main_map_init" %}
-
-    <img src="/static/img/logo.png" id="logo">
+    <div id="map-wrapper">
+        <div id="content">
+            {% leaflet_map "main" callback="main_map_init" %}
+        </div>
     </div>
+    <footer>
+        <div class="container">
+            <p class="text-muted">&copy; Performances Lab 2015</p>
+        </div>
+    </footer>
 
 <script type="text/javascript">
     var icon_ok = L.icon({
@@ -232,13 +238,34 @@
 </script>
 
 <style type="text/css">
-    html, body, #content {
+    html, body {
         height: 100%;
         position: relative;
     }
 
+    #map-wrapper {
+        height: 100%;
+        padding: 50px 0;
+    }
+
+    #content {
+    }
+
+    footer {
+        position: absolute;
+        bottom: 0;
+        width: 100%;
+        /* Set the fixed height of the footer here */
+        height: 50px;
+        background-color: #222;
+    }
+
+    footer p {
+        margin-top: 16px;
+    }
+
     .leaflet-container {
-        height: calc(100% - 51px);
+        height: 100%;
     }
     #logo {
         position: absolute;
