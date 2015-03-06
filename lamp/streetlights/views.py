@@ -30,8 +30,8 @@ def geodata(request):
     		)
 	elif request.method == 'POST':
 		#s=request.POST.get['statut']
-		s=request.POST.get['statut']
-		id_lampe=float(request.POST.get['id'])
+		s=request.POST['statut']
+		id_lampe=float(request.POST['id'])
 		sama_lampe=get_object_or_404(Lampadaire, gid=id_lampe)
 		sama_lampe.states=s
 		sama_lampe.save()
